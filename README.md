@@ -16,11 +16,10 @@ This library is to make our application highly modular. The basic premise of it 
 ## What makes `funpicker` better?
 The single thing that makes funpicker better than all other platforms is that it relies 100% on making the process simipler for the user. There's only a couple of functions to be able to start getting information from exchanges immediately for either storage or analytics:
 
-It is a layer on top of `request` and ccxt. We added the following:
+It is a layer on top of `request` and `ccxt`. We added the following:
 
 * An easy way to find data
-* Robust fallback for price data (will fall back to `cryptocompare`)
-* The user will have easy query options to get data with extra grainularity (thanks to `lagerfeuer`)
+* The user will have easy query options to get data with extra grainularity
 * Easy access to orderbook information. Has an option of an in-memory queue to deal with rate limits. Or you could let it fail and not acknowledge it.
 
 
@@ -30,79 +29,75 @@ Using a few functions, we reach out to various API's to do the following:
 * Get orderbook information
 * Get pricing
 
+In the future the plan is to introduce the following:
+
+* General sentiment data
+* Generic Twitter Streams
+* Generic Reddit Streams
+
+
+
 ### Example:
 ---
 ```python
-from funtime import Store, Converter
-import mimesis # this is used to seed data for our test
-import time
+from funpicker import Queuy # this is the main query object
 
-# Create a library and access the store you want
-store = Store().create_lib("hello.World").get_store()
+# Initialize the query class. 
+# It has a lot of default values at the start that we could use
+fpq = Query()
 
-# store the data with a timestamp
-store['hello.World'].store({
-    "type": "price",
-    "currency": "ETH_USD",
-    "timestamp": time.time(),
-    "candlestick": {
-        "open": 1234,
-        "close": 1234.41,
-        "other": "etc"
-    }
-})
-
-
-# Query general information. It returns a generator
-runs = store['hello.World'].query({
-    "type": "price"
-})
-
-# Check for results
-for r in runs:
-    print(r)
-
-
-# Even get information with complex time queries
-runs2 = store['hello.World'].query_time(time_type="before", start=time.time(), query_type="price")
-
-
-# Check for results
-for r in runs:
-    print(r)
+# This gets all of the minutely historical price information for bitcoin.
+# This should work out the box
+initial = fpq.get()
 
 ```
 
-## Using the Pandas/Dask converter
+
+### Setting Desired Parameters dynamically
+```python
+from funpicker import Query, QueryType
+
+# Now this gets the last 30 hours of ETH to USD prices. 
+# This is in price format and this should be return all of the compressed candlebars
+fpq = Query().set_crypto("ETH").set_fiat("USD").set_exchange("binance").set_period("hour").set_limit(30).get()
+```
+
+### Can directly get the single price data as well dynamically from an exchange. 
+This price information is entirely. It has all of the information availble to send directly into `funtime`. The time-series database
+
+```python
+from funpicker import Query, QueryType
+
+# Same as before. Only it gets the latest price information for one period of time. 
+# This should be within 30-40 seconds of getting posted onto the exchange according to cryptocompare
+fpq = Query().set_crypto("ETH").set_fiat("USD").set_exchange("binance").set_period("hour").set_limit(30).get(QueryType.price)
+```
+
+
+### Get the order book
 
 As a data scientist, you may want to handle your data in dataframe format. With `funtime`, you can get your timestamp information in both `pandas.DataFrame` and `dask.DataFrame` format. You would use the `Converter` import. 
 
 ```python
-from funtime import Store, Converter
+from funpicker import Query, QueryType
 
-
-runs = store['hello.World'].query({
-    "type": "price"
-})
-
-# if you want a pandas object
-df = Converter.to_dataframe(runs)
-
-# If you want to do parallel processing within dask
-ddf = Converter.to_dataframe(runs, "dask")
+# Similar as before, only it gets the orderbook when returned
+fpq = Query().set_crypto("ETH").set_fiat("USD").set_exchange("binance").get(QueryType.orderbook)
 ```
+
 
 
 ## How to install
 
-Make sure to install mongodb at the very beginning. The instructions are different for different operating systems. Then run:
+This requires an internet connection. Using `pip` or `pipenv`, run:
+
 
 ```
-pip install funtime
+pip install funpicker
 ```
 
 Or you can use `pipenv` for it:
 
 ```
-pipenv install funtime
+pipenv install funpicker
 ```

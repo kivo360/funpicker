@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setup(
     name="funpicker",
-    version="0.1.1.1",
+    version="0.1.1",
     author="Kevin Hill",
     author_email="kevin@funguana.com",
     description="A library to collect information for your trading bot. Use with `funtime` time series library",
     long_description=long_description,
     long_description_content_type="text/markdown",
     py_modules=["funpicker"],
-    install_requires=['scipy', 'numpy', 'pandas', 'click', 'dask', 'dask[complete]', 'python-decouple', 'maya', 'funtime', 'cryptocompare', 'ccxt'],
+    install_requires=['cryptocompare', 'ccxt', 'requests'],
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
