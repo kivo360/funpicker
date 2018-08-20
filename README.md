@@ -8,7 +8,7 @@ This library is to make our application highly modular. The basic premise of it 
 
 1. You explain which information you want to collect in a context
 2. You get a return with that information
-3. You store what you intend using another library (such as funtime or sql)
+3. You store what you intend using another library (such as `funtime` or sql)
 
 **Understand `funpicker` is a firm wrapper around `ccxt` and `request`. Its job is to make pricing easier to access for the common bot maker**
 
